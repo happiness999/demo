@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 配置包扫描器 -->
+    <context:component-scan base-package="com.taotao.manager.controller"/>
+
+    <!-- 加载配置文件 字典 controller类中需要使用-->
+    <!--<context:property-placeholder location="classpath:resource.properties"/>-->
+
+    <!--
+        注解驱动
+        配置了这个之后，处理器映射器和处理器适配器就无需在配置了
+     -->
+    <mvc:annotation-driven />
+
+    <!--
+        配置视图解析器
+        prefix 视图URL前缀
+        suffix 视图URL后缀
+     -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- 配置dubbo服务 -->
+    <dubbo:application name="taotao-web" />
+
+    <!-- 方式一:使用广播 -->
+    <!--<dubbo:registry address="multicast://224.5.6.7:1234" />-->
+
+    <!-- 方式二:直连 -->
+    <!--<dubbo:registry address="N/A" />-->
+
+    <!-- 声明要调用的服务，timeout是设置连接超时最长时间,如果不设置，默认一秒超时，重试3次 -->
+    <!-- 使用广播这里不需要配置URL,使用直连需要配置一个URL -->
+    <!--<dubbo:reference interface="com.taotao.manager.service.TestService"
+                 id="testService" timeout="1000000" url="dubbo://127.0.0.1:20880"/>-->
+
+    <!-- 方式三:注册中心 -->
+    <dubbo:registry protocol="zookeeper" address="192.168.37.161:2181"/>
+    <!-- 方式三 -->
+    <dubbo:reference interface="com.taotao.manager.service.TestService"
+                     id="testService" timeout="1000000"/>
+    <dubbo:reference interface="com.taotao.manager.service.ItemCatService"
+                     id="itemCatService" timeout="1000000"/>
+    <!-- 配置资源映射 -->
+    <!-- 启用默认servlet,目的:不拦截静态资源 .js .css .tld ... -->
+    <mvc:default-servlet-handler/>
+
+</beans>
