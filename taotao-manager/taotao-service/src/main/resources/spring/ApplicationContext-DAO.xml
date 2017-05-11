@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 加载配置文件 -->
+    <context:property-placeholder location="classpath:resource/db.properties"/>
+
+    <!--
+        配置数据库连接池
+        destroy-method="close" 当数据库连接不使用的时候,就把该连接重新放到数据池中,方便下次使用调用.
+     -->
+    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!-- 检查数据库连接池中空闲连接的间隔时间，单位是分，默认值：240，如果要取消则设置为 0 -->
+        <property name="idleConnectionTestPeriod" value="60"/>
+        <!-- 连接池中未使用的链接最大存活时间，单位是分，默认值：60，如果要永远存活设置为 0 -->
+        <property name="idleMaxAge" value="30"/>
+        <!-- 每个分区最大的连接数 -->
+        <property name="maxConnectionsPerPartition" value="150" />
+        <!-- 每个分区最小的连接数 -->
+        <property name="minConnectionsPerPartition" value="5" />
+    </bean>
+
+    <!-- 配置Mapper -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 引入数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 加载Mybatis全局配置文件 -->
+        <property name="configLocation" value="classpath:mybatis/SqlMapConfig.xml"/>
+        <!-- 配置POJO对象别名,没有必要在SqlMapConfig.xml里边配置 -->
+        <property name="typeAliasesPackage" value="com.taotao.manager.pojo"/>
+    </bean>
+
+    <!-- 配置Mapper包扫描器 -->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.taotao.manager.mapper"/>
+    </bean>
+</beans>
