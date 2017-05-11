@@ -2,7 +2,6 @@ package com.taotao;
 
 /**
  * Hello world!
- *
  */
 public class App 
 {
